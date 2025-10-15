@@ -21,7 +21,7 @@ import pusher
 import json
 from common.agora_utilities.RtcTokenBuilder2 import RtcTokenBuilder, Role_Publisher
 from pusher_push_notifications import PushNotifications
-from backend.settings import PUSHER_APP_ID, PUSHER_CLUSTER, PUSHER_KEY, PUSHER_SECRET, BEAMS_ID, BEAMS_KEY, AGORA_APP_ID, AGORA_APP_CERTIFICATE, AGORA_RTC_EVENTS_SECRET
+from backend.settings import PUSHER_APP_ID, PUSHER_CLUSTER, PUSHER_KEY, PUSHER_SECRET, BEAMS_ID, BEAMS_KEY, AGORA_APP_ID, AGORA_APP_CERTIFICATE, AGORA_RTC_EVENTS_SECRET, FRONTEND_URL
 import hmac
 import hashlib
 from django.views.decorators.csrf import csrf_exempt
@@ -221,7 +221,7 @@ class ProjectViewSet(ModelViewSet):
                         'title': project.title,
                         'body': body_string,
                         'icon': project.image.url,
-                        "deep_link": f'http://localhost:4200/project/{project.id}'
+                        "deep_link": f'{FRONTEND_URL}/project/{project.id}'
                     }
                 }
             }
@@ -307,7 +307,7 @@ class ProjectViewSet(ModelViewSet):
                         'title': project.title,
                         'body': body_text,
                         'icon': project.image.url,
-                        "deep_link": f'http://localhost:4200/project/{project.id}'
+                        "deep_link": f'{FRONTEND_URL}/project/{project.id}'
                     }
                 }        
             }
@@ -438,21 +438,7 @@ class ProjectViewSet(ModelViewSet):
 
         
 
-        '''
-        beams_client.publish_to_users(
-            user_ids=user_ids,
-            publish_body={
-                'web': {
-                    'notification': {
-                        'title': project.title,
-                        'body': 'video call has started',
-                        'icon': project.image.url,
-                        "deep_link": f'http://localhost:4200/project/{project.id}'
-                    }
-                }        
-            }
-        )
-        '''
+        
 
         return Response(data={"agora_token":token})
     
