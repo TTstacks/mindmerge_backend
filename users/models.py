@@ -80,5 +80,6 @@ class Student(models.Model):
             message='enter a grade in a 11A format',
         ),
     ])
+    description = models.TextField(default="")
     school = models.ForeignKey(School, on_delete = models.CASCADE)
     image = models.ImageField(upload_to=safe_file_name('users'), default='users/default.jpg')

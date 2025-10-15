@@ -9,6 +9,10 @@ def trigger_member_event(pusher_client, channel_name, event_name, projectReadSer
     })
 
 def process_agora_webhook(pusher_client, beams_client, event_type, channel_name, payload):
+
+    if channel_name == 'test_webhook':
+        return
+
     project_id = int(channel_name.removeprefix('channel-'))
     project = Project.objects.get(id = project_id)
     projectReadSerializer = ProjectReadSerializer(project)
