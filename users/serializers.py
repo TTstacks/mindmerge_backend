@@ -8,7 +8,7 @@ class StudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Student
-        fields = ['school', 'grade', 'image']
+        fields = ['school', 'grade', 'image', 'description']
         read_only_fields = ['image']
 
     def to_internal_value(self, data):
@@ -41,6 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
             student = instance.student
             student.school = student_data.get('school', student.school)
             student.grade = student_data.get('grade', student.grade)
+            student.description = student_data.get('description', student.description)
             student.save()
         
         return instance

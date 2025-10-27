@@ -121,20 +121,23 @@ class ProjectViewSet(ModelViewSet):
 
 
         if search_for is not None:
-            search_vectors = (
-                SearchVector('title') + 
-                SearchVector('description') + 
-                SearchVector('admin__first_name') + 
-                SearchVector('admin__middle_name') + 
-                SearchVector('admin__last_name')
-            )
 
-            
-            search_query = SearchQuery(search_for)
+            if search_for.strip() != '':
 
-            queryset = queryset.annotate(
-                rank = SearchRank(search_vectors, search_query)
-            ).order_by('-rank')
+                search_vectors = (
+                    SearchVector('title', weight='A') + 
+                    SearchVector('description', weight='A') + 
+                    SearchVector('admin__first_name', weight='B') + 
+                    SearchVector('admin__middle_name', weight='B') + 
+                    SearchVector('admin__last_name', weight='B')
+                )
+
+                
+                search_query = SearchQuery(search_for)
+
+                queryset = queryset.annotate(
+                    rank = SearchRank(search_vectors, search_query)
+                ).order_by('-rank')
 
 
         queryset = queryset.exclude(privacy=2)
@@ -326,7 +329,7 @@ class ProjectViewSet(ModelViewSet):
         return self.create_message(request, project)
         
     def get_messages(self, request, project):
-        messages = Message.objects.filter(project__id = project.id).order_by('-id')[:20:-1]
+        messages = list(Message.objects.filter(project__id = project.id).select_related('user').order_by('-id')[:20])[::-1]
         messages_serializer = MessageSerializerRead(messages, many=True)
         return Response(data = messages_serializer.data)
 
@@ -486,7 +489,7 @@ class TagListView(ListAPIView):
         name = self.request.query_params.get('name')
         if name is not None:
             if name != '':
-                return queryset.filter(name__startswith=name).annotate(count = Count("project")).order_by("-count", "name")
+                return queryset.filter(name__istartswith=name).annotate(count = Count("project")).order_by("-count", "name")[:10]
         return []
     
 class ProjectSerachListView(ListAPIView):
@@ -499,11 +502,11 @@ class ProjectSerachListView(ListAPIView):
 
         if search_for is not None:
             search_vectors = (
-                SearchVector('title') + 
-                SearchVector('description') + 
-                SearchVector('admin__first_name') + 
-                SearchVector('admin__middle_name') + 
-                SearchVector('admin__last_name')
+                SearchVector('title', weight = 'A') + 
+                SearchVector('description', weight = 'A') + 
+                SearchVector('admin__first_name', weight = 'B') + 
+                SearchVector('admin__middle_name', weight = 'B') + 
+                SearchVector('admin__last_name', weight = 'B')
             )
 
             
@@ -514,7 +517,7 @@ class ProjectSerachListView(ListAPIView):
             ).order_by('-rank')
 
             queryset = queryset.exclude(privacy=2)
-            return queryset.distinct()
+            return queryset.distinct()[:10]
 
 
         return []

@@ -45,5 +45,13 @@ class Message(models.Model):
     time = models.DateTimeField(auto_now_add=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='message_parent')
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['project', 'id']),
+            models.Index(fields=['user']),
+        ]
+
+
+
 class WebhookEvent(models.Model):
     idempotency_key = models.CharField(max_length=255, unique=True)
