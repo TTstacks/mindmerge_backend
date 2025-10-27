@@ -121,20 +121,23 @@ class ProjectViewSet(ModelViewSet):
 
 
         if search_for is not None:
-            search_vectors = (
-                SearchVector('title', weight='A') + 
-                SearchVector('description', weight='A') + 
-                SearchVector('admin__first_name', weight='B') + 
-                SearchVector('admin__middle_name', weight='B') + 
-                SearchVector('admin__last_name', weight='B')
-            )
 
-            
-            search_query = SearchQuery(search_for)
+            if search_for.strip() != '':
 
-            queryset = queryset.annotate(
-                rank = SearchRank(search_vectors, search_query)
-            ).order_by('-rank')
+                search_vectors = (
+                    SearchVector('title', weight='A') + 
+                    SearchVector('description', weight='A') + 
+                    SearchVector('admin__first_name', weight='B') + 
+                    SearchVector('admin__middle_name', weight='B') + 
+                    SearchVector('admin__last_name', weight='B')
+                )
+
+                
+                search_query = SearchQuery(search_for)
+
+                queryset = queryset.annotate(
+                    rank = SearchRank(search_vectors, search_query)
+                ).order_by('-rank')
 
 
         queryset = queryset.exclude(privacy=2)
