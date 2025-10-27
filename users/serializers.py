@@ -41,6 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
             student = instance.student
             student.school = student_data.get('school', student.school)
             student.grade = student_data.get('grade', student.grade)
+            student.description = student_data.get('description', student.description)
             student.save()
         
         return instance
